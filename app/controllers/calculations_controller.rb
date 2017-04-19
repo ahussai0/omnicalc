@@ -11,14 +11,25 @@ class CalculationsController < ApplicationController
     # ================================================================================
 
 
-    @word_count = "Replace this string with your answer."
+    @word_count = @text.split.size
 
-    @character_count_with_spaces = "Replace this string with your answer."
+    @character_count_with_spaces = @text.length
 
-    @character_count_without_spaces = "Replace this string with your answer."
 
-    @occurrences = "Replace this string with your answer."
+    @character_count_without_spaces = @text.gsub(" ","").gsub("\n","").gsub("\r","").gsub("\t","").length
+    #@counter==0
+    #  @textArray=@text.split
+    #  for i in 0..@word_count
+    #    if @textArray[i]==@special_word
+    #        @counter++
+    #    end
+    #  end
+    #@occurrences = @counter
+    def count_em(string, substring)
+      string.scan(/(?=#{substring})/).count
+    end
 
+    @occurrences = count_em(@text.downcase,@special_word.downcase)
     # ================================================================================
     # Your code goes above.
     # ================================================================================
@@ -37,8 +48,22 @@ class CalculationsController < ApplicationController
     # The number of years the user input is in the integer @years.
     # The principal value the user input is in the decimal @principal.
     # ================================================================================
+    def payment(rate, bal, term)
+      # Convert annual rate to monthly and make it decimal.
+      r = rate / 1200
 
-    @monthly_payment = "Replace this string with your answer."
+      # Numerator
+      n = r * bal
+
+      # Denominator
+      d = 1 - (1 + r)**-term
+
+      # Calc the monthly payment.
+      pmt = n / d
+    end
+
+
+    @monthly_payment = payment(@apr, @principal, @years*12)
 
     # ================================================================================
     # Your code goes above.
@@ -60,12 +85,12 @@ class CalculationsController < ApplicationController
     #   number of seconds as a result.
     # ================================================================================
 
-    @seconds = "Replace this string with your answer."
-    @minutes = "Replace this string with your answer."
-    @hours = "Replace this string with your answer."
-    @days = "Replace this string with your answer."
-    @weeks = "Replace this string with your answer."
-    @years = "Replace this string with your answer."
+    @seconds = @ending - @starting
+    @minutes = @seconds/60
+    @hours = @minutes/60
+    @days = @hours/24
+    @weeks = @days/7
+    @years = @weeks/52
 
     # ================================================================================
     # Your code goes above.
@@ -82,27 +107,64 @@ class CalculationsController < ApplicationController
     # The numbers the user input are in the array @numbers.
     # ================================================================================
 
-    @sorted_numbers = "Replace this string with your answer."
+    @sorted_numbers = @numbers.sort
 
-    @count = "Replace this string with your answer."
+    @count = @numbers.count
 
-    @minimum = "Replace this string with your answer."
+    @minimum = @numbers.min
 
-    @maximum = "Replace this string with your answer."
+    @maximum = @numbers.max
 
-    @range = "Replace this string with your answer."
+    @range = @maximum-@minimum
 
-    @median = "Replace this string with your answer."
+    def median(array)                          #Define your method accepting an array as an argument.
+      array = array.sort                     #sort the array from least to greatest
+      if array.length.odd?                   #is the length of the array odd?
+        return array[(array.length - 1) / 2] #find value at this index
+      else array.length.even?                #is the length of the array even?
+        return ( array[array.length/2] + array[array.length/2 - 1] )/2.to_f
+        #average the values found at these two indexes and convert to float
+      end
+    end
+    @median = median(@numbers)
 
-    @sum = "Replace this string with your answer."
+    @sum = @numbers.sum
 
-    @mean = "Replace this string with your answer."
+    @mean = @sum / @count
+    def mean(array)
+      array.inject(0) { |sum, x| sum += x } / array.size.to_f
+    end
+    def standard_deviation(array)
+      m = mean(array)
+      variance = array.inject(0) { |variance, x| variance += (x - m) ** 2 }
+      return Math.sqrt(variance/(array.size))
+    end
 
-    @variance = "Replace this string with your answer."
+    @variance = (standard_deviation(@numbers) * standard_deviation(@numbers))
 
-    @standard_deviation = "Replace this string with your answer."
+    @standard_deviation = standard_deviation(@numbers)
 
-    @mode = "Replace this string with your answer."
+    def mode(array)
+
+      count = []  # Number of times element is repeated in array
+      output = []
+      array.compact!
+      unique = array.uniq
+      j=0
+
+      unique.each do |i|
+        count[j] = array.count(i)
+        j+=1
+      end
+      k=0
+      count.each do |i|
+        output[k] = unique[k] if i == count.max
+        k+=1
+      end
+
+      return output.compact.inspect
+    end
+    @mode = mode(@numbers)
 
     # ================================================================================
     # Your code goes above.
